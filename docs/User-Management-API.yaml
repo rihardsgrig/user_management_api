@@ -1,0 +1,402 @@
+openapi: 3.1.0
+info:
+  title: User Management API
+  version: '1.0'
+  description: User Management API
+  contact:
+    name: Rihards
+servers:
+  - url: 'http://localhost:8080'
+tags:
+  - name: Users
+    description: User operations
+  - name: Groups
+    description: Group operations
+paths:
+  /users:
+    post:
+      summary: Create New User
+      tags:
+        - Users
+      operationId: post-user
+      responses:
+        '200':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                New User Bob Fellow:
+                  value:
+                    id: 12
+                    first_name: Bob
+                    last_name: Fellow
+                    email: bob.fellow@gmail.com
+                    created_at: '2020-11-18'
+                    is_admin: false
+        '400':
+          description: Missing Required Information
+        '409':
+          description: Email Already Taken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+              required:
+                - first_name
+                - last_name
+                - email
+            examples:
+              Create User Bob Fellow:
+                value:
+                  first_name: Bob
+                  last_name: Fellow
+                  email: bob.fellow@gmail.com
+        description: Post the necessary fields for the API to create a new user.
+      description: Create a new user.
+    get:
+      summary: List All Users
+      tags:
+        - Users
+      operationId: get-users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                List of all users:
+                  value:
+                    - id: 142
+                      first_name: Alice
+                      last_name: Smith
+                      email: alice.smith@gmail.com
+                      created_at: '2019-08-24'
+                      is_admin: true
+                    - id: 200
+                      first_name: John
+                      last_name: Doe
+                      email: john.doe@gmail.com
+                      created_at: '2020-09-24'
+                      is_admin: false
+      description: List all users.
+    parameters: []
+  '/users/{userId}':
+    parameters:
+      - schema:
+          type: integer
+        name: userId
+        in: path
+        required: true
+        description: Id of an existing user.
+    get:
+      summary: Get User Info by User ID
+      tags:
+        - Users
+      responses:
+        '200':
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                Get User Alice Smith:
+                  value:
+                    id: 142
+                    first_name: Alice
+                    last_name: Smith
+                    email: alice.smith@gmail.com
+                    created_at: '2019-08-24'
+                    is_admin: true
+        '404':
+          description: User Not Found
+      operationId: get-users-userId
+      description: Retrieve the information of the user with the matching user ID.
+    delete:
+      summary: Delete User by User ID
+      tags:
+        - Users
+      operationId: delete-users-userId
+      description: Delete the user with the matching user ID.
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+  /groups:
+    post:
+      summary: Create New Group
+      tags:
+        - Groups
+      operationId: post-group
+      responses:
+        '200':
+          description: Group Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+              examples:
+                New Group Project:
+                  value:
+                    id: 12
+                    title: Project
+                    description: 'Donec sodales mattis diam, nec euismod lorem sodales ac. Curabitur sed leo mi. Quisque lacinia dignissim arcu, vitae condimentum tortor semper sed.'
+        '400':
+          description: Missing Required Information
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+              required:
+                - title
+                - description
+            examples:
+              Create Group Project:
+                value:
+                  title: Project
+                  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vulputate arcu laoreet mi pharetra, at fermentum urna faucibus. Pellentesque tortor ligula, viverra et tellus at, volutpat vehicula odio. '
+        description: Post the necessary fields for the API to create a new group.
+      description: Create a new group.
+    get:
+      summary: List All Groups
+      tags:
+        - Groups
+      operationId: get-groups
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+              examples:
+                List of all groups:
+                  value:
+                    - id: 142
+                      title: Project group
+                      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vulputate arcu laoreet mi pharetra, at fermentum urna faucibus. Pellentesque tortor ligula, viverra et tellus at, volutpat vehicula odio. '
+                    - id: 142
+                      title: Martians
+                      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vulputate arcu laoreet mi pharetra, at fermentum urna faucibus. Pellentesque tortor ligula, viverra et tellus at, volutpat vehicula odio. '
+      description: List all groups.
+    parameters: []
+  '/groups/{groupId}':
+    parameters:
+      - schema:
+          type: string
+        name: groupId
+        in: path
+        required: true
+    get:
+      summary: Get Group Info by Group ID
+      tags:
+        - Groups
+      responses:
+        '200':
+          description: Group Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+              examples:
+                Get Group Alice:
+                  value:
+                    id: 142
+                    title: Alice
+                    description: 'Donec sodales mattis diam, nec euismod lorem sodales ac. Curabitur sed leo mi. Quisque lacinia dignissim arcu, vitae condimentum tortor semper sed.'
+        '404':
+          description: User Not Found
+      operationId: get-groups-groupId
+      description: Retrieve the information of the group with the matching group ID.
+    delete:
+      summary: Delete Group by Group ID
+      tags:
+        - Groups
+      operationId: delete-groups-groupId
+      description: Delete the group with the matching group ID.
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+  '/groups/{groupId}/members':
+    parameters:
+      - schema:
+          type: string
+        name: groupId
+        in: path
+        required: true
+    post:
+      summary: Add Member To Group
+      tags:
+        - Groups
+      operationId: post-groups-groupId-members
+      description: Add user to a group as a member.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type:
+                    - integer
+              required:
+                - user_id
+            examples:
+              Add User To Group:
+                value:
+                  user_id: 142
+        description: Post the necessary fields for the API to add member to a group.
+      responses:
+        '200':
+          description: User Added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                New group member:
+                  value:
+                    id: 142
+                    first_name: Alice
+                    last_name: Smith
+                    email: alice.smith@gmail.com
+                    created_at: '2019-08-24'
+                    is_admin: true
+        '409':
+          description: Conflict
+    get:
+      summary: List All Group Members
+      tags:
+        - Groups
+      operationId: get-groups-groupId-members
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                List of all group members:
+                  value:
+                    - id: 142
+                      first_name: Alice
+                      last_name: Smith
+                      email: alice.smith@gmail.com
+                      created_at: '2019-08-24'
+                      is_admin: true
+                    - id: 200
+                      first_name: John
+                      last_name: Doe
+                      email: john.doe@gmail.com
+                      created_at: '2020-09-24'
+                      is_admin: false
+      description: List all group members.
+      parameters: []
+  '/groups/{groupId}/members/{userId}':
+    parameters:
+      - schema:
+          type: string
+        name: groupId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    delete:
+      summary: Remove Member From Group
+      tags:
+        - Groups
+      operationId: delete-groups-groupId-members-userId
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+      description: Remove a user from a group where the user has been added as a member.
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      description: ''
+      examples:
+        - id: 142
+          first_name: Alice
+          last_name: Smith
+          email: alice.smith@gmail.com
+          created_at: '2019-08-24'
+          is_admin: true
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date
+          description: The date that the user was created.
+        is_admin:
+          type: boolean
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
+        - created_at
+        - is_admin
+    Group:
+      title: Group
+      type: object
+      description: ''
+      examples:
+        - id: 142
+          title: Project group
+          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vulputate arcu laoreet mi pharetra, at fermentum urna faucibus. Pellentesque tortor ligula, viverra et tellus at, volutpat vehicula odio. '
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+        title:
+          type: string
+        description:
+          type: string
+      required:
+        - id
+        - title
+        - description

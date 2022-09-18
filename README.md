@@ -30,3 +30,17 @@ make start-local
 ```
 
 And then call `http://localhost:8080/health-check` to check all is ok.
+
+## Documentation
+
+### Domain model for the processes
+
+![Domain](docs/Domain_model.png)
+
+### Database ER model
+
+![ERD](docs/ERD.png)
+
+### API OAS documentation
+
+[can be found here](docs/User-Management-API.yaml)
