@@ -1,9 +1,24 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Method App\\\\Application\\\\Handler\\\\Group\\\\ListMembersHandler\\:\\:handle\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Application/Handler/Group/ListMembersHandler.php
+
+		-
 			message: "#^Parameter \\#1 \\$request of method App\\\\Application\\\\Handler\\\\Group\\\\CreateGroupHandler\\:\\:handle\\(\\) expects App\\\\Application\\\\Handler\\\\Group\\\\Dto\\\\CreateGroupRequest, mixed given\\.$#"
 			count: 1
 			path: src/Controller/Group/GroupController.php
+
+		-
+			message: "#^Cannot access offset 'user_id' on mixed\\.$#"
+			count: 2
+			path: src/Controller/Group/MembershipController.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 1
+			path: src/Controller/Group/MembershipController.php
 
 		-
 			message: "#^Parameter \\#1 \\$request of method App\\\\Application\\\\Handler\\\\User\\\\CreateUserHandler\\:\\:handle\\(\\) expects App\\\\Application\\\\Handler\\\\User\\\\Dto\\\\CreateUserRequest, mixed given\\.$#"

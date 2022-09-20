@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -48,7 +48,7 @@ class UserController extends AbstractController
         try {
             $data = $this->createHandler->handle($dto);
         } catch (UserAreadyExistsException $e) {
-            throw new PreconditionFailedHttpException($e->getMessage(), $e);
+            throw new UnprocessableEntityHttpException($e->getMessage(), $e);
         }
 
         return $this->json($data->__toArray());

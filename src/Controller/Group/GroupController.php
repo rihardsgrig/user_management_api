@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -69,7 +69,7 @@ class GroupController extends AbstractController
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage(), $e);
         } catch (MembersAttachedToGroupException $e) {
-            throw new PreconditionFailedHttpException($e->getMessage(), $e);
+            throw new UnprocessableEntityHttpException($e->getMessage(), $e);
         }
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);

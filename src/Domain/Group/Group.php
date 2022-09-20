@@ -78,6 +78,11 @@ class Group
         return $this->memberships->count() > 0;
     }
 
+    public function hasMember(User $member): bool
+    {
+        return $this->memberships->contains($member);
+    }
+
     public function addMembership(User $member): void
     {
         if ($this->memberships->contains($member)) {
