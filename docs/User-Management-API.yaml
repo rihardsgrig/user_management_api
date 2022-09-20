@@ -6,7 +6,7 @@ info:
   contact:
     name: Rihards
 servers:
-  - url: 'http://localhost:8080'
+  - url: 'http://localhost:8000'
 tags:
   - name: Users
     description: User operations
@@ -37,8 +37,19 @@ paths:
                     is_admin: false
         '400':
           description: Missing Required Information
-        '409':
+        '422':
           description: Email Already Taken
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '422':
+                  value:
+                    message: string
       requestBody:
         content:
           application/json:
@@ -93,6 +104,19 @@ paths:
                       created_at: '2020-09-24'
                       is_admin: false
       description: List all users.
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: offset
+          description: Pagination offset.
+          allowEmptyValue: true
+        - schema:
+            type: number
+          in: query
+          name: limit
+          description: Pagination limit.
+          allowEmptyValue: true
     parameters: []
   '/users/{userId}':
     parameters:
@@ -124,6 +148,17 @@ paths:
                     is_admin: true
         '404':
           description: User Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '404':
+                  value:
+                    message: string
       operationId: get-users-userId
       description: Retrieve the information of the user with the matching user ID.
     delete:
@@ -137,6 +172,17 @@ paths:
           description: No Content
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '404':
+                  value:
+                    message: string
   /groups:
     post:
       summary: Create New Group
@@ -202,6 +248,17 @@ paths:
                       title: Martians
                       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vulputate arcu laoreet mi pharetra, at fermentum urna faucibus. Pellentesque tortor ligula, viverra et tellus at, volutpat vehicula odio. '
       description: List all groups.
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: offset
+          description: Pagination offset
+        - schema:
+            type: number
+          in: query
+          name: limit
+          description: Pagination limit
     parameters: []
   '/groups/{groupId}':
     parameters:
@@ -229,6 +286,17 @@ paths:
                     description: 'Donec sodales mattis diam, nec euismod lorem sodales ac. Curabitur sed leo mi. Quisque lacinia dignissim arcu, vitae condimentum tortor semper sed.'
         '404':
           description: User Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '404':
+                  value:
+                    message: string
       operationId: get-groups-groupId
       description: Retrieve the information of the group with the matching group ID.
     delete:
@@ -242,6 +310,30 @@ paths:
           description: No Content
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '404':
+                  value:
+                    message: string
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '422':
+                  value:
+                    message: string
   '/groups/{groupId}/members':
     parameters:
       - schema:
@@ -272,23 +364,42 @@ paths:
                   user_id: 142
         description: Post the necessary fields for the API to add member to a group.
       responses:
-        '200':
-          description: User Added
+        '201':
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties: {}
               examples:
-                New group member:
+                '201':
+                  value: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '404':
                   value:
-                    id: 142
-                    first_name: Alice
-                    last_name: Smith
-                    email: alice.smith@gmail.com
-                    created_at: '2019-08-24'
-                    is_admin: true
-        '409':
-          description: Conflict
+                    message: string
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '422':
+                  value:
+                    message: string
     get:
       summary: List All Group Members
       tags:
@@ -318,6 +429,19 @@ paths:
                       email: john.doe@gmail.com
                       created_at: '2020-09-24'
                       is_admin: false
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '404':
+                  value:
+                    message: string
       description: List all group members.
       parameters: []
   '/groups/{groupId}/members/{userId}':
@@ -342,6 +466,30 @@ paths:
           description: No Content
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '404':
+                  value:
+                    message: string
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                '422':
+                  value:
+                    message: string
       description: Remove a user from a group where the user has been added as a member.
 components:
   schemas:
@@ -367,19 +515,19 @@ components:
         email:
           type: string
           format: email
+        is_admin:
+          type: boolean
         created_at:
           type: string
           format: date
           description: The date that the user was created.
-        is_admin:
-          type: boolean
       required:
         - id
         - first_name
         - last_name
         - email
-        - created_at
         - is_admin
+        - created_at
     Group:
       title: Group
       type: object

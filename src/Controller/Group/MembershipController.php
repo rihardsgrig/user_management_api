@@ -30,7 +30,13 @@ class MembershipController extends AbstractController
     #[Route('/groups/{groupId}/members', name: 'app_members', methods: ['GET'])]
     public function index(Request $request, int $groupId): Response
     {
-        return $this->json($this->listMemberHandler->handle($groupId));
+        try {
+            $members = $this->listMemberHandler->handle($groupId);
+        } catch (ResourceNotFoundException $e) {
+            throw new NotFoundHttpException($e->getMessage(), $e);
+        }
+
+        return $this->json($members);
     }
 
     #[Route('/groups/{groupId}/members', methods: ['POST'])]
