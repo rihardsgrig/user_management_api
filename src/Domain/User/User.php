@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\User;
 
 use App\Domain\Group\Group;
+use App\Domain\User\Exception\InvalidInputDataException;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,34 +16,35 @@ use Doctrine\ORM\Mapping\Entity;
 class User
 {
     private const DEFAULT_USER_ROLE = 'ROLE_USER';
+    private const ADMIN_ROLE = 'ROLE_ADMIN';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer", options: ["unsigned"=>true])]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private string $firstName;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private string $lastName;
 
-    #[ORM\Column(type: "string", length: 32, unique: true, nullable: false)]
+    #[ORM\Column(type: 'string', length: 32, unique: true, nullable: false)]
     private string $email;
 
     /**
      * @var array<int, string>
      */
-    #[ORM\Column(type: "json", nullable: false)]
+    #[ORM\Column(type: 'json', nullable: false)]
     private array $roles = [];
 
-    #[ORM\Column(type:"datetime_immutable", nullable:false , options:["default"=>"CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private DateTimeImmutable $createdAt;
 
     /**
      * @var Collection<int, Group>
      */
-     #[ORM\ManyToMany(targetEntity:Group::class, inversedBy:"memberships")]
+    #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'memberships')]
     private Collection $groups;
 
     /**
@@ -52,8 +54,13 @@ class User
         string $firstName,
         string $lastName,
         string $email,
+        UniqueEmailSpecificationInterface $uniqueEmailSpecification,
         array $roles = [self::DEFAULT_USER_ROLE]
     ) {
+        if (!$uniqueEmailSpecification->isSatisfiedBy($email)) {
+            throw new InvalidInputDataException(sprintf('Email %s already exists', $email));
+        }
+
         $this->groups = new ArrayCollection();
         $this->setFirstName($firstName);
         $this->setLastName($lastName);
@@ -85,6 +92,11 @@ class User
     public function createdAt(): DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array(self::ADMIN_ROLE, $this->roles(), true);
     }
 
     /**
