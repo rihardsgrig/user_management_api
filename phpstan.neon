@@ -3,6 +3,7 @@ parameters:
     excludePaths:
         - bin
 includes:
+    - phpstan-baseline.neon
     - vendor/phpstan/phpstan-webmozart-assert/extension.neon
     - vendor/phpstan/phpstan-doctrine/extension.neon
     - vendor/phpstan/phpstan-doctrine/rules.neon

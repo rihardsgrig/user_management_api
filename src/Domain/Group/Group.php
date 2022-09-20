@@ -12,28 +12,27 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Entity;
 
 #[Entity()]
-#[ORM\Table(name:"usergroup")]
+#[ORM\Table(name: 'usergroup')]
 class Group
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer", options: ["unsigned"=>true])]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     private int $id;
 
-    #[ORM\Column(type: "string", length:255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private string $title;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(type: 'string')]
     private string $description;
 
-    #[ORM\Column(type:"datetime_immutable", nullable:false , options:["default"=>"CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private DateTimeImmutable $createdAt;
 
     /**
      * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: "groups", cascade: ['persist', 'merge'], fetch: 'LAZY')]
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'groups', cascade: ['persist', 'merge'], fetch: 'LAZY')]
     private Collection $memberships;
 
     public function __construct(
@@ -72,6 +71,11 @@ class Group
     public function memberships(): Collection
     {
         return $this->memberships;
+    }
+
+    public function hasMembers(): bool
+    {
+        return $this->memberships->count() > 0;
     }
 
     public function addMembership(User $member): void
