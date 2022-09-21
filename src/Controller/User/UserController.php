@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\User;
 
+use App\Application\Handler\Exceptions\InvalidUserEmailException;
 use App\Application\Handler\Exceptions\ResourceNotFoundException;
 use App\Application\Handler\Exceptions\UserAreadyExistsException;
 use App\Application\Handler\User\CreateUserHandler;
@@ -47,11 +48,11 @@ class UserController extends AbstractController
 
         try {
             $data = $this->createHandler->handle($dto);
-        } catch (UserAreadyExistsException $e) {
+        } catch (UserAreadyExistsException|InvalidUserEmailException $e) {
             throw new UnprocessableEntityHttpException($e->getMessage(), $e);
         }
 
-        return $this->json($data->__toArray());
+        return $this->json($data->toArray());
     }
 
     #[Route(path: '/users/{id}', methods: ['GET'])]
@@ -63,7 +64,7 @@ class UserController extends AbstractController
             throw new NotFoundHttpException($e->getMessage(), $e);
         }
 
-        return $this->json($data->__toArray());
+        return $this->json($data->toArray());
     }
 
     #[Route(path: '/users/{id}', methods: ['DELETE'])]

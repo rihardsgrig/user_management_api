@@ -6,6 +6,7 @@ namespace App\Domain\User;
 
 use App\Domain\Group\Group;
 use App\Domain\User\Exception\InvalidInputDataException;
+use App\Domain\User\Exception\InvalidUserEmailException;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -58,7 +59,7 @@ class User
         array $roles = [self::DEFAULT_USER_ROLE]
     ) {
         if (!$uniqueEmailSpecification->isSatisfiedBy($email)) {
-            throw new InvalidInputDataException(sprintf('Email %s already exists', $email));
+            throw new InvalidInputDataException(sprintf('User with email "%s" already exist.', $email));
         }
 
         $this->groups = new ArrayCollection();
@@ -140,7 +141,7 @@ class User
     private function setEmail(string $email): void
     {
         if (false === filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException("Invalid email $email");
+            throw new InvalidUserEmailException(sprintf('Invalid email "%s".', $email));
         }
 
         $this->email = $email;

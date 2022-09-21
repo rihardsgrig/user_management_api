@@ -46,7 +46,7 @@ class GroupController extends AbstractController
         $dto = $this->serializer->deserialize($request->getContent(), CreateGroupRequest::class, 'json');
         $data = $this->createHandler->handle($dto);
 
-        return $this->json($data->__toArray());
+        return $this->json($data->toArray());
     }
 
     #[Route(path: '/groups/{id}', methods: ['GET'])]
@@ -58,7 +58,7 @@ class GroupController extends AbstractController
             throw new NotFoundHttpException($e->getMessage(), $e);
         }
 
-        return $this->json($data->__toArray());
+        return $this->json($data->toArray());
     }
 
     #[Route(path: '/groups/{id}', methods: ['DELETE'])]

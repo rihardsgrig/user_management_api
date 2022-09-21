@@ -83,6 +83,8 @@
         }
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^7.1",
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
         "friendsofphp/php-cs-fixer": "^3.11",
         "maglnet/composer-require-checker": "^4.2",
         "php-parallel-lint/php-parallel-lint": "^1.3",

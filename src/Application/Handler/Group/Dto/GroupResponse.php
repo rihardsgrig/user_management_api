@@ -22,7 +22,7 @@ class GroupResponse
     /**
      * @return array{'id': int, 'title': string, 'description': string, 'created_at': string}
      */
-    public function __toArray(): array
+    public function toArray(): array
     {
         return [
             'id' => $this->id,

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Application\Handler\User;
 
+use App\Application\Handler\Exceptions\InvalidUserEmailException as InvalidEmailException;
 use App\Application\Handler\Exceptions\UserAreadyExistsException;
 use App\Application\Handler\User\Dto\CreateUserRequest;
 use App\Application\Handler\User\Dto\UserResponse;
 use App\Domain\User\Exception\InvalidInputDataException;
+use App\Domain\User\Exception\InvalidUserEmailException;
 use App\Domain\User\UniqueEmailSpecificationInterface;
 use App\Domain\User\User;
 use App\Domain\User\UserRepositoryInterface;
@@ -31,6 +33,8 @@ class CreateUserHandler
             );
         } catch (InvalidInputDataException $e) {
             throw new UserAreadyExistsException($e->getMessage(), $e);
+        } catch (InvalidUserEmailException $e) {
+            throw new InvalidEmailException($e->getMessage(), $e);
         }
 
         $this->userRepository->save($user);
