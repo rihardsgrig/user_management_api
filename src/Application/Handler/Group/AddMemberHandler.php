@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Handler\Group;
 
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
-use App\Application\Handler\Exceptions\UserIsMemberException as UserIsMemberOfTheGroupException;
-use App\Application\Handler\Exceptions\UserMissingException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
+use App\Application\Handler\Exception\UserIsMemberException as UserIsMemberOfTheGroupException;
+use App\Application\Handler\Exception\UserMissingException;
+use App\Application\Response\ResponseInterface;
 use App\Domain\Group\GroupRepositoryInterface;
 use App\Domain\User\UserRepositoryInterface;
 
@@ -14,11 +15,12 @@ class AddMemberHandler
 {
     public function __construct(
         private readonly GroupRepositoryInterface $groupRepository,
-        private readonly UserRepositoryInterface $userRepository
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly MemberResponseBuilder $responseBuilder
     ) {
     }
 
-    public function handle(int $groupId, int $userId): void
+    public function handle(int $groupId, int $userId): ResponseInterface
     {
         $group = $this->groupRepository->find($groupId);
         if ($group === null) {
@@ -41,5 +43,7 @@ class AddMemberHandler
         $group->addMembership($user);
 
         $this->groupRepository->save($group);
+
+        return $this->responseBuilder->buildEmpty();
     }
 }

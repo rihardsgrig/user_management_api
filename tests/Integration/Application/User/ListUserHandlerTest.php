@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Application\User;
 
 use App\Application\Handler\User\ListUsersHandler;
+use App\Application\Handler\User\UserResponseBuilder;
 use App\Domain\User\User;
 use App\Domain\User\UserRepositoryInterface;
 use App\Infrastructure\Specification\UniqueEmailSpecification;
@@ -30,10 +31,11 @@ class ListUserHandlerTest extends KernelTestCase
     {
         $handler = new ListUsersHandler(
             $this->userRepository,
+            new UserResponseBuilder()
         );
         $response = $handler->handle();
 
-        $this->assertEmpty($response);
+        $this->assertEmpty($response->data());
     }
 
     public function testReturnsUserList(): void
@@ -42,10 +44,11 @@ class ListUserHandlerTest extends KernelTestCase
 
         $handler = new ListUsersHandler(
             $this->userRepository,
+            new UserResponseBuilder()
         );
         $response = $handler->handle();
 
-        $this->assertCount(10, $response);
+        $this->assertCount(10, $response->data());
     }
 
     public function testPaginatesUserList(): void
@@ -53,13 +56,14 @@ class ListUserHandlerTest extends KernelTestCase
         $this->seeder(3);
         $handler = new ListUsersHandler(
             $this->userRepository,
+            new UserResponseBuilder()
         );
 
         $response = $handler->handle(0, 2);
 
-        $this->assertCount(2, $response);
-        $this->assertEquals('test1@test.com', $response[0]['email']);
-        $this->assertEquals('test2@test.com', $response[1]['email']);
+        $this->assertCount(2, $response->data());
+        $this->assertSame('test1@test.com', $response->data()[0]['email']);
+        $this->assertSame('test2@test.com', $response->data()[1]['email']);
     }
 
     private function seeder(int $count): void

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Group;
 
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
+use App\Application\Handler\Group\GroupResponseBuilder;
 use App\Application\Handler\Group\ShowGroupHandler;
 use App\Domain\Group\Group;
 use App\Domain\Group\GroupRepositoryInterface;
@@ -37,18 +38,20 @@ class ShowGroupHandlerTest extends KernelTestCase
 
         $handler = new ShowGroupHandler(
             $this->groupRepository,
+            new GroupResponseBuilder()
         );
         $response = $handler->handle($groupId);
 
-        $this->assertEquals($group->title(), $response->toArray()['title']);
-        $this->assertEquals($group->description(), $response->toArray()['description']);
-        $this->assertEquals($group->createdAt()->format(DateTime::ATOM), $response->toArray()['created_at']);
+        $this->assertSame($group->title(), $response->data()['title']);
+        $this->assertSame($group->description(), $response->data()['description']);
+        $this->assertSame($group->createdAt()->format(DateTime::ATOM), $response->data()['created_at']);
     }
 
     public function testUserIsNotFound(): void
     {
         $handler = new ShowGroupHandler(
             $this->groupRepository,
+            new GroupResponseBuilder()
         );
 
         $this->expectException(ResourceNotFoundException::class);

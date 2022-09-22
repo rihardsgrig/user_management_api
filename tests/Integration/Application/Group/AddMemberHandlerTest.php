@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Group;
 
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
-use App\Application\Handler\Exceptions\UserIsMemberException;
-use App\Application\Handler\Exceptions\UserMissingException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
+use App\Application\Handler\Exception\UserIsMemberException;
+use App\Application\Handler\Exception\UserMissingException;
 use App\Application\Handler\Group\AddMemberHandler;
+use App\Application\Handler\Group\MemberResponseBuilder;
+use App\Application\Response\EmptyResponse;
 use App\Domain\Group\Group;
 use App\Domain\Group\GroupRepositoryInterface;
 use App\Domain\User\User;
@@ -37,7 +39,8 @@ class AddMemberHandlerTest extends KernelTestCase
     {
         $handler = new AddMemberHandler(
             $this->groupRepository,
-            $this->userRepository
+            $this->userRepository,
+            new MemberResponseBuilder()
         );
 
         $this->expectException(ResourceNotFoundException::class);
@@ -57,7 +60,8 @@ class AddMemberHandlerTest extends KernelTestCase
 
         $handler = new AddMemberHandler(
             $this->groupRepository,
-            $this->userRepository
+            $this->userRepository,
+            new MemberResponseBuilder()
         );
 
         $this->expectException(UserMissingException::class);
@@ -88,7 +92,8 @@ class AddMemberHandlerTest extends KernelTestCase
 
         $handler = new AddMemberHandler(
             $this->groupRepository,
-            $this->userRepository
+            $this->userRepository,
+            new MemberResponseBuilder()
         );
 
         $this->expectException(UserIsMemberException::class);
@@ -121,10 +126,12 @@ class AddMemberHandlerTest extends KernelTestCase
 
         $handler = new AddMemberHandler(
             $this->groupRepository,
-            $this->userRepository
+            $this->userRepository,
+            new MemberResponseBuilder()
         );
 
-        $handler->handle($groupId, $userId);
+        $response = $handler->handle($groupId, $userId);
         $this->assertTrue($group->hasMember($user));
+        $this->assertInstanceOf(EmptyResponse::class, $response);
     }
 }

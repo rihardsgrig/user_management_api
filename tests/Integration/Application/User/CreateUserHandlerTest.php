@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\User;
 
-use App\Application\Handler\Exceptions\InvalidUserEmailException;
-use App\Application\Handler\Exceptions\UserAreadyExistsException;
+use App\Application\Handler\Exception\InvalidUserEmailException;
+use App\Application\Handler\Exception\UserAreadyExistsException;
 use App\Application\Handler\User\CreateUserHandler;
 use App\Application\Handler\User\Dto\CreateUserRequest;
+use App\Application\Handler\User\UserResponseBuilder;
 use App\Domain\User\User;
 use App\Domain\User\UserRepositoryInterface;
 use App\Infrastructure\Specification\UniqueEmailSpecification;
@@ -33,7 +34,8 @@ class CreateUserHandlerTest extends KernelTestCase
     {
         $handler = new CreateUserHandler(
             $this->userRepository,
-            $this->uniqueEmailSpecification
+            $this->uniqueEmailSpecification,
+            new UserResponseBuilder()
         );
 
         $request = new CreateUserRequest();
@@ -43,17 +45,18 @@ class CreateUserHandlerTest extends KernelTestCase
 
         $response = $handler->handle($request);
 
-        $this->assertContains('John', $response->toArray());
-        $this->assertContains('Doe', $response->toArray());
-        $this->assertContains('test@test.com', $response->toArray());
-        $this->assertContains('test@test.com', $response->toArray());
+        $this->assertContains('John', $response->data());
+        $this->assertContains('Doe', $response->data());
+        $this->assertContains('test@test.com', $response->data());
+        $this->assertContains('test@test.com', $response->data());
     }
 
     public function testUserIsNotCreatedWithInvalidEmail(): void
     {
         $handler = new CreateUserHandler(
             $this->userRepository,
-            $this->uniqueEmailSpecification
+            $this->uniqueEmailSpecification,
+            new UserResponseBuilder()
         );
 
         $request = new CreateUserRequest();
@@ -79,7 +82,8 @@ class CreateUserHandlerTest extends KernelTestCase
 
         $handler = new CreateUserHandler(
             $this->userRepository,
-            $this->uniqueEmailSpecification
+            $this->uniqueEmailSpecification,
+            new UserResponseBuilder()
         );
 
         $request = new CreateUserRequest();

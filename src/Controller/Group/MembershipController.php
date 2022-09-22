@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller\Group;
 
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
-use App\Application\Handler\Exceptions\UserIsMemberException;
-use App\Application\Handler\Exceptions\UserMissingException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
+use App\Application\Handler\Exception\UserIsMemberException;
+use App\Application\Handler\Exception\UserMissingException;
 use App\Application\Handler\Group\AddMemberHandler;
 use App\Application\Handler\Group\ListMembersHandler;
 use App\Application\Handler\Group\RemoveMemberHandler;
@@ -36,7 +36,7 @@ class MembershipController extends AbstractController
             throw new NotFoundHttpException($e->getMessage(), $e);
         }
 
-        return $this->json($members);
+        return $this->json($members->data());
     }
 
     #[Route('/groups/{groupId}/members', methods: ['POST'])]
@@ -50,7 +50,7 @@ class MembershipController extends AbstractController
         }
 
         try {
-            $this->addMemberHandler->handle($groupId, $userId);
+            $response = $this->addMemberHandler->handle($groupId, $userId);
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage(), $e);
         } catch (UserMissingException $e) {
@@ -59,20 +59,20 @@ class MembershipController extends AbstractController
             throw new UnprocessableEntityHttpException($e->getMessage(), $e);
         }
 
-        return new JsonResponse(null, Response::HTTP_CREATED);
+        return new JsonResponse($response->data(), Response::HTTP_CREATED);
     }
 
     #[Route('/groups/{groupId}/members/{userId}', methods: ['DELETE'])]
     public function remove(int $groupId, int $userId): Response
     {
         try {
-            $this->removeMemberHandler->handle($groupId, $userId);
+            $response = $this->removeMemberHandler->handle($groupId, $userId);
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage(), $e);
         } catch (UserMissingException $e) {
             throw new UnprocessableEntityHttpException($e->getMessage(), $e);
         }
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse($response->data(), Response::HTTP_NO_CONTENT);
     }
 }

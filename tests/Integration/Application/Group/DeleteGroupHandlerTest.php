@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Group;
 
-use App\Application\Handler\Exceptions\MembersAttachedToGroupException;
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
+use App\Application\Handler\Exception\MembersAttachedToGroupException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
 use App\Application\Handler\Group\DeleteGroupHandler;
+use App\Application\Handler\Group\GroupResponseBuilder;
+use App\Application\Response\EmptyResponse;
 use App\Domain\Group\Group;
 use App\Domain\Group\GroupRepositoryInterface;
 use App\Domain\User\User;
@@ -41,8 +43,11 @@ class DeleteGroupHandlerTest extends KernelTestCase
 
         $handler = new DeleteGroupHandler(
             $this->groupRepository,
+            new GroupResponseBuilder()
         );
-        $handler->handle($groupId);
+
+        $response = $handler->handle($groupId);
+        $this->assertInstanceOf(EmptyResponse::class, $response);
 
         // test group does not exist anymore
         $this->assertNull($this->groupRepository->find($groupId));
@@ -52,6 +57,7 @@ class DeleteGroupHandlerTest extends KernelTestCase
     {
         $handler = new DeleteGroupHandler(
             $this->groupRepository,
+            new GroupResponseBuilder()
         );
 
         $this->expectException(ResourceNotFoundException::class);
@@ -79,6 +85,7 @@ class DeleteGroupHandlerTest extends KernelTestCase
         $groupId = $group->getId();
         $handler = new DeleteGroupHandler(
             $this->groupRepository,
+            new GroupResponseBuilder()
         );
 
         $this->expectException(MembersAttachedToGroupException::class);

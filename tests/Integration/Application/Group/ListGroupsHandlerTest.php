@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Group;
 
+use App\Application\Handler\Group\GroupResponseBuilder;
 use App\Application\Handler\Group\ListGroupsHandler;
 use App\Domain\Group\Group;
 use App\Domain\Group\GroupRepositoryInterface;
@@ -27,10 +28,11 @@ class ListGroupsHandlerTest extends KernelTestCase
     {
         $handler = new ListGroupsHandler(
             $this->groupRepository,
+            new GroupResponseBuilder()
         );
         $response = $handler->handle();
 
-        $this->assertEmpty($response);
+        $this->assertEmpty($response->data());
     }
 
     public function testReturnsGroupList(): void
@@ -39,10 +41,11 @@ class ListGroupsHandlerTest extends KernelTestCase
 
         $handler = new ListGroupsHandler(
             $this->groupRepository,
+            new GroupResponseBuilder()
         );
         $response = $handler->handle();
 
-        $this->assertCount(10, $response);
+        $this->assertCount(10, $response->data());
     }
 
     public function testPaginatesGroupList(): void
@@ -50,13 +53,14 @@ class ListGroupsHandlerTest extends KernelTestCase
         $this->seeder(3);
         $handler = new ListGroupsHandler(
             $this->groupRepository,
+            new GroupResponseBuilder()
         );
 
         $response = $handler->handle(0, 2);
 
-        $this->assertCount(2, $response);
-        $this->assertEquals('Group 1', $response[0]['title']);
-        $this->assertEquals('Group 2', $response[1]['title']);
+        $this->assertCount(2, $response->data());
+        $this->assertSame('Group 1', $response->data()[0]['title']);
+        $this->assertSame('Group 2', $response->data()[1]['title']);
     }
 
     private function seeder(int $count): void

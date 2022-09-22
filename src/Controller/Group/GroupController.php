@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Group;
 
-use App\Application\Handler\Exceptions\MembersAttachedToGroupException;
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
+use App\Application\Handler\Exception\MembersAttachedToGroupException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
 use App\Application\Handler\Group\CreateGroupHandler;
 use App\Application\Handler\Group\DeleteGroupHandler;
 use App\Application\Handler\Group\Dto\CreateGroupRequest;
@@ -37,7 +37,9 @@ class GroupController extends AbstractController
         $offset = (int) ($request->query->get('offset') ?? 0);
         $limit = (int) ($request->query->get('limit') ?? 10);
 
-        return $this->json($this->listHandler->handle($offset, $limit));
+        $data = $this->listHandler->handle($offset, $limit);
+
+        return $this->json($data->data());
     }
 
     #[Route(path: '/groups', methods: ['POST'])]
@@ -46,7 +48,7 @@ class GroupController extends AbstractController
         $dto = $this->serializer->deserialize($request->getContent(), CreateGroupRequest::class, 'json');
         $data = $this->createHandler->handle($dto);
 
-        return $this->json($data->toArray());
+        return $this->json($data->data());
     }
 
     #[Route(path: '/groups/{id}', methods: ['GET'])]
@@ -58,20 +60,20 @@ class GroupController extends AbstractController
             throw new NotFoundHttpException($e->getMessage(), $e);
         }
 
-        return $this->json($data->toArray());
+        return $this->json($data->data());
     }
 
     #[Route(path: '/groups/{id}', methods: ['DELETE'])]
     public function delete(int $id): Response
     {
         try {
-            $this->deleteHandler->handle($id);
+            $response = $this->deleteHandler->handle($id);
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException($e->getMessage(), $e);
         } catch (MembersAttachedToGroupException $e) {
             throw new UnprocessableEntityHttpException($e->getMessage(), $e);
         }
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse($response->data(), Response::HTTP_NO_CONTENT);
     }
 }

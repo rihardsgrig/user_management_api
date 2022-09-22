@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Application\Handler\User;
 
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
+use App\Application\Response\ResponseInterface;
 use App\Domain\User\UserRepositoryInterface;
 
 class DeleteUserHandler
 {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly UserResponseBuilder $responseBuilder
     ) {
     }
 
-    public function handle(int $id): void
+    public function handle(int $id): ResponseInterface
     {
         $user = $this->userRepository->find($id);
 
@@ -23,5 +25,7 @@ class DeleteUserHandler
         }
 
         $this->userRepository->remove($user);
+
+        return $this->responseBuilder->buildEmpty();
     }
 }

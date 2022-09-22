@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Handler\User;
 
-use App\Application\Handler\Exceptions\InvalidUserEmailException as InvalidEmailException;
-use App\Application\Handler\Exceptions\UserAreadyExistsException;
+use App\Application\Handler\Exception\InvalidUserEmailException as InvalidEmailException;
+use App\Application\Handler\Exception\UserAreadyExistsException;
 use App\Application\Handler\User\Dto\CreateUserRequest;
-use App\Application\Handler\User\Dto\UserResponse;
+use App\Application\Response\ResponseInterface;
 use App\Domain\User\Exception\InvalidInputDataException;
 use App\Domain\User\Exception\InvalidUserEmailException;
 use App\Domain\User\UniqueEmailSpecificationInterface;
@@ -18,11 +18,12 @@ class CreateUserHandler
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
-        private readonly UniqueEmailSpecificationInterface $uniqueEmailSpecification
+        private readonly UniqueEmailSpecificationInterface $uniqueEmailSpecification,
+        private readonly UserResponseBuilder $responseBuilder
     ) {
     }
 
-    public function handle(CreateUserRequest $request): UserResponse
+    public function handle(CreateUserRequest $request): ResponseInterface
     {
         try {
             $user = new User(
@@ -39,6 +40,6 @@ class CreateUserHandler
 
         $this->userRepository->save($user);
 
-        return UserResponse::createFromUser($user);
+        return $this->responseBuilder->buildItem($user);
     }
 }

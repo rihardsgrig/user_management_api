@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace App\Application\Handler\Group;
 
-use App\Application\Handler\Exceptions\MembersAttachedToGroupException;
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
+use App\Application\Handler\Exception\MembersAttachedToGroupException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
+use App\Application\Response\ResponseInterface;
 use App\Domain\Group\GroupRepositoryInterface;
 
 class DeleteGroupHandler
 {
     public function __construct(
-        private readonly GroupRepositoryInterface $groupRepository
+        private readonly GroupRepositoryInterface $groupRepository,
+        private readonly GroupResponseBuilder $responseBuilder
     ) {
     }
 
-    public function handle(int $id): void
+    public function handle(int $id): ResponseInterface
     {
         $group = $this->groupRepository->find($id);
 
@@ -28,5 +30,7 @@ class DeleteGroupHandler
         }
 
         $this->groupRepository->remove($group);
+
+        return $this->responseBuilder->buildEmpty();
     }
 }

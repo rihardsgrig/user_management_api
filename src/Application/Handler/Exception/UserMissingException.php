@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Handler\Exceptions;
+namespace App\Application\Handler\Exception;
 
 final class UserMissingException extends BusinessLogicViolationException
 {

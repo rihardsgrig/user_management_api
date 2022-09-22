@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\User;
 
-use App\Application\Handler\Exceptions\ResourceNotFoundException;
+use App\Application\Handler\Exception\ResourceNotFoundException;
 use App\Application\Handler\User\DeleteUserHandler;
+use App\Application\Handler\User\UserResponseBuilder;
+use App\Application\Response\EmptyResponse;
 use App\Domain\User\User;
 use App\Domain\User\UserRepositoryInterface;
 use App\Infrastructure\Specification\UniqueEmailSpecification;
@@ -41,9 +43,11 @@ class DeleteUserHandlerTest extends KernelTestCase
 
         $handler = new DeleteUserHandler(
             $this->userRepository,
+            new UserResponseBuilder()
         );
-        $handler->handle($userId);
+        $response = $handler->handle($userId);
 
+        $this->assertInstanceOf(EmptyResponse::class, $response);
         // test user does not exist anymore
         $this->assertNull($this->userRepository->find($userId));
     }
@@ -52,6 +56,7 @@ class DeleteUserHandlerTest extends KernelTestCase
     {
         $handler = new DeleteUserHandler(
             $this->userRepository,
+            new UserResponseBuilder()
         );
 
         $this->expectException(ResourceNotFoundException::class);
